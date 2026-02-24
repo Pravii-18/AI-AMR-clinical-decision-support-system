@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Real Trained AI Clinical Decision System</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+background:#020617;
+color:white;
+}
+
+header{
+text-align:center;
+padding:15px;
+font-size:22px;
+font-weight:bold;
+background:#0f172a;
+}
+
+.container{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:#0f172a;
+padding:20px;
+border-radius:12px;
+}
+
+select,button{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+background:#38bdf8;
+font-weight:bold;
+cursor:pointer;
+}
+
+.core{
+width:180px;
+height:180px;
+border-radius:50%;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:26px;
+font-weight:bold;
+border:3px solid #38bdf8;
+}
+
+.report{
+background:black;
+padding:15px;
+border-radius:10px;
+height:200px;
+overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+REAL TRAINED AI – AMR Clinical Decision Support System
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h3> Patient & Pathogen Input</h3>
+
+<select id="pathogen">
+<option>MRSA</option>
+<option>Pseudomonas</option>
+<option>Acinetobacter</option>
+<option>Enterobacteriaceae</option>
+</select>
+
+<select id="mutation">
+<option value="0">Mutation: None</option>
+<option value="0.5">Mutation: Medium</option>
+<option value="1">Mutation: High</option>
+</select>
+
+<select id="exposure">
+<option value="0">Exposure: Low</option>
+<option value="0.5">Exposure: Moderate</option>
+<option value="1">Exposure: High</option>
+</select>
+
+<button onclick="runAI()">Run Trained AI Model</button>
+
+<div class="core" id="core">--</div>
+
+</div>
+
+<div class="card">
+<h3> Patient Clinical Report Monitor</h3>
+<div id="report" class="report">Waiting for AI prediction…</div>
+</div>
+
+</div>
+
+<script>
+
+/* ===== REAL TRAINED MODEL WEIGHTS (FROM YOUR COLAB) ===== */
+
+const model = {
+w_mutation: 0.96383394,
+w_exposure: 0.36764999,
+bias: -0.72730203
+};
+
+/* sigmoid activation (REAL ML) */
+function sigmoid(x){
+return 1/(1+Math.exp(-x));
+}
+
+function runAI(){
+
+let pathogen=document.getElementById("pathogen").value;
+let mutation=parseFloat(document.getElementById("mutation").value);
+let exposure=parseFloat(document.getElementById("exposure").value);
+
+let core=document.getElementById("core");
+let report=document.getElementById("report");
+
+/* ===== REAL MACHINE LEARNING INFERENCE ===== */
+
+let z =
+(model.w_mutation * mutation) +
+(model.w_exposure * exposure) +
+model.bias;
+
+let prediction = sigmoid(z);
+
+/* classification */
+let risk="";
+let color="";
+let treatment="";
+let timing="";
+
+if(prediction > 0.7){
+risk="HIGH";
+color="#ef4444";
+treatment="Use alternative or combination antibiotic therapy.";
+timing="Immediate intervention required.";
+}
+else if(prediction > 0.4){
+risk="MEDIUM";
+color="#facc15";
+treatment="Adjust antibiotic dosage and monitor resistance.";
+timing="Review after 24–48 hrs.";
+}
+else{
+risk="LOW";
+color="#22c55e";
+treatment="Standard antibiotic therapy recommended.";
+timing="Normal treatment schedule.";
+}
+
+/* pathogen guidance */
+
+let pathogenNote="";
+if(pathogen==="MRSA") pathogenNote="Consider Vancomycin or Linezolid.";
+if(pathogen==="Pseudomonas") pathogenNote="Consider Piperacillin-Tazobactam.";
+if(pathogen==="Acinetobacter") pathogenNote="Consider Carbapenem alternatives.";
+if(pathogen==="Enterobacteriaceae") pathogenNote="Monitor beta-lactam resistance.";
+
+/* display output */
+
+core.style.borderColor=color;
+core.innerHTML=risk;
+
+report.innerHTML=
+"<b>Neural Network Probability:</b> "+prediction.toFixed(3)+
+"<br><b>Selected Pathogen:</b> "+pathogen+
+"<br><br><b>AI Risk Level:</b> "+risk+
+"<br><br><b>Treatment Recommendation:</b><br>"+treatment+
+"<br><br><b>Pathogen Guidance:</b><br>"+pathogenNote+
+"<br><br><b>Timing:</b> "+timing+
+"<br><br> Real trained AI model prediction completed.";
+
+}
+
+</script>
+
+</body>
+</html>
